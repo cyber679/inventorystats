@@ -250,8 +250,8 @@ class BuildingStats {
 
         this.css += `#stats-overlay {
             position: fixed;
-            top: 0; right: 0; bottom: 0; overflow: auto;
-            left: 35%;
+            top: 0; right: 00%; bottom: 0; overflow: auto;
+            left: 20%;
             background-color: #222;
             z-index: 10000;
             padding: 0px;
