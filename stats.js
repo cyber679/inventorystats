@@ -546,7 +546,7 @@ class BuildingStats {
     setBuildings(buildings, player=false, era=false) {
         let stats = this.stats;
         stats.currentPlayer = player || localStorage.current_player_name;
-        stats.era = era || "SpaceAgeSpaceHub";
+        stats.era = era || CurrentEra || "SpaceAgeSpaceHub";
         stats.isOther = this.stats.currentPlayer != localStorage.current_player_name;
         stats.buildings = buildings;
     }
