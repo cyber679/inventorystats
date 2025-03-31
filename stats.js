@@ -622,15 +622,15 @@ class BuildingStats {
         Ddefense = def_boost_defender + att_def_boost_defender + allAttStatsBoost;
 
         // QI additions
-        let QIattBoostAttacker = this.getQIBoostForEntity(entity, this.stats.era, "att_boost_attacker");
-        let QIattDefBoostAttacker = this.getQIBoostForEntity(entity, this.stats.era, "att_def_boost_attacker");
-        let QIdefBoostAttacker = this.getQIBoostForEntity(entity, this.stats.era, "def_boost_attacker");
+        let QIattBoostAttacker = this.getBoostForEntity(entity, this.stats.era, "att_boost_attacker", "guild_raids");
+        let QIattDefBoostAttacker = this.getBoostForEntity(entity, this.stats.era, "att_def_boost_attacker", "guild_raids");
+        let QIdefBoostAttacker = this.getBoostForEntity(entity, this.stats.era, "def_boost_attacker", "guild_raids");
         QI_Aoffense = QIattBoostAttacker + QIattDefBoostAttacker;
         QI_Adefense = QIdefBoostAttacker + QIattDefBoostAttacker;
 
-        let QIattBoostDefender = this.getQIBoostForEntity(entity, this.stats.era, "att_boost_defender");
-        let QIattDefBoostDefender = this.getQIBoostForEntity(entity, this.stats.era, "att_def_boost_defender");
-        let QIdefBoostDefender = this.getQIBoostForEntity(entity, this.stats.era, "def_boost_defender");
+        let QIattBoostDefender = this.getBoostForEntity(entity, this.stats.era, "att_boost_defender", "guild_raids");
+        let QIattDefBoostDefender = this.getBoostForEntity(entity, this.stats.era, "att_def_boost_defender", "guild_raids");
+        let QIdefBoostDefender = this.getBoostForEntity(entity, this.stats.era, "def_boost_defender", "guild_raids");
         QI_Doffense = QIattBoostDefender + QIattDefBoostDefender;
         QI_Ddefense = QIdefBoostDefender + QIattDefBoostDefender;
 
@@ -714,7 +714,15 @@ class BuildingStats {
         return result;
     };
 
-    getBoostForEntity(entity, era, wantedBoost) {
+    getBoostForEntity(entity, era, wantedBoost, targetedFeature="battlegrounds") {
+
+	if (typeof(targetedFeature) == "string")
+	{
+		targetedFeature = [targetedFeature];
+		if (targetedFeature[0] != "guild_raids")
+			targetedFeature.push("all");
+	}
+
         if (typeof(entity) == 'string')
             entity = MainParser.CityEntities[entity];
 
@@ -751,7 +759,7 @@ class BuildingStats {
             
             const boosts = entity?.components?.[age]?.boosts?.boosts || [];
             for (const boost of boosts) {
-                if ((boost.targetedFeature === "battleground" || boost.targetedFeature === "all") && boost.type == wantedBoost)
+                if (targetedFeature.includes(boost.targetedFeature) && boost.type == wantedBoost)
                     total += boost.value;
             }
             if (entity.abilities) {
@@ -761,45 +769,13 @@ class BuildingStats {
                         const hintMap = hint.boostHintEraMap;
                         if (!hintMap) continue;
                         if (!hintMap[age]) continue;
-                        if (!["all", "battleground"].includes(hintMap[age].targetedFeature)) continue;
+                        if (!targetedFeature.includes(hintMap[age].targetedFeature)) continue;
                         if (hintMap[age].type != wantedBoost) continue;
                         total += hintMap[age].value;
                     }
                 }
             }
 
-        }
-        return total;
-    }
-
-    // NEW QI function for guild_raids
-    getQIBoostForEntity(entity, era, wantedBoost) {
-        if (typeof(entity) == 'string')
-            entity = MainParser.CityEntities[entity];
-
-        if (!entity)
-            throw Error("Unknown entity for QI");
-
-        let total = 0;
-
-        for (const age of ["AllAge", era]) {
-            const boosts = entity?.components?.[age]?.boosts?.boosts || [];
-            for (const boost of boosts) {
-                if (boost.targetedFeature === "guild_raids" && boost.type == wantedBoost)
-                    total += boost.value;
-            }
-            if (entity.abilities) {
-                for (const ability of entity.abilities) {
-                    const hints = ability?.boostHints || [];
-                    for (const hint of hints) {
-                        const hintMap = hint.boostHintEraMap;
-                        if (!hintMap) continue;
-                        if (!hintMap[age]) continue;
-                        if (hintMap[age].targetedFeature === "guild_raids" && hintMap[age].type == wantedBoost)
-                            total += hintMap[age].value;
-                    }
-                }
-            }
         }
         return total;
     }
