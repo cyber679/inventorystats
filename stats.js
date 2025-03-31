@@ -12,7 +12,7 @@
     
 
     // run this after the rest of the snippet finishes parsing
-    setTimeout(async()=>{
+    setTimeout(async()=> {
         if (typeof(localStorage.current_player_name) == 'undefined')
             localStorage.current_player_name = await getNameFromFOEHelperDB();
 
@@ -493,21 +493,37 @@ class BuildingStats {
         let totalDOffense = 0;
         let GBs = !this.stats.isOther;
 
-        buildingEntries.forEach(({ Aoffense, Adefense, Doffense, Ddefense, quantity, cityentity_id, type }) => {
+        // QI additions
+        let totalQI_AOffense = 0;
+        let totalQI_ADefense = 0;
+        let totalQI_DOffense = 0;
+        let totalQI_DDefense = 0;
+
+        buildingEntries.forEach(({ Aoffense, Adefense, Doffense, Ddefense, quantity, cityentity_id, type,
+                                   // QI additions
+                                   QI_Aoffense, QI_Adefense, QI_Doffense, QI_Ddefense }) => {
             if (!GBs && cityentity_id.indexOf("Landmark") >= 0)
                 return;
             totalAOffense += Aoffense * quantity;
             totalADefense += Adefense * quantity;
             totalDOffense += Doffense * quantity;
             totalDDefense += Ddefense * quantity;
+
+            // QI additions
+            totalQI_AOffense += (QI_Aoffense || 0) * quantity;
+            totalQI_ADefense += (QI_Adefense || 0) * quantity;
+            totalQI_DOffense += (QI_Doffense || 0) * quantity;
+            totalQI_DDefense += (QI_Ddefense || 0) * quantity;
         });
         this.overlay.find(".totals").html(` Player: <span class='${this.stats.isOther?"player-name other":"player-name own"}'>${this.stats.currentPlayer}</span> | Era: ${this.stats.era}<br/>A. Offense: ${totalAOffense} | A. Defense: ${totalADefense} | D. Offense: ${totalDOffense} | D. Defense: ${totalDDefense}`
-            + (GBs ? "" :  "<Br/><i><small>Not including GBs</small></i>"))
+            + (GBs ? "" :  "<Br/><i><small>Not including GBs</small></i>")
+            // QI additions
+            + `<br/>QI: A. Offense: ${totalQI_AOffense} | A. Defense: ${totalQI_ADefense} | D. Offense: ${totalQI_DOffense} | D. Defense: ${totalQI_DDefense}`
+        );
 
-        if (typeof window.statTracking != 'undefined') // this is for another module to link in.  Define a statTracking function and this will put the stats of any visited city in to it.
+        if (typeof window.statTracking != 'undefined')
             window.statTracking({player: this.stats.currentPlayer, era: this.stats.era, AOffense: this.totalAOffense, ADefense: this.totalDDefense, DOffense: this.totalDOffense, DDefense: this.totalDDefense});
     }
-
 
     getClassForEfficiency(efficiency) {
         if (isNaN(efficiency)) return "efNone";
@@ -572,6 +588,13 @@ class BuildingStats {
         let Adefense = 0;
         let Doffense = 0;
         let Ddefense = 0;
+        
+        // QI additions
+        let QI_Aoffense = 0;
+        let QI_Adefense = 0;
+        let QI_Doffense = 0;
+        let QI_Ddefense = 0;
+
         let length = entity.length || entity.components?.AllAge?.placement?.size?.y || undefined;
         let width = entity.width || entity.components?.AllAge?.placement?.size?.x || undefined;
         let roads;
@@ -597,6 +620,19 @@ class BuildingStats {
         let def_boost_defender = this.getBoostForEntity(entity, this.stats.era, "def_boost_defender");
         Doffense = att_boost_defender + att_def_boost_defender + allAttStatsBoost;
         Ddefense = def_boost_defender + att_def_boost_defender + allAttStatsBoost;
+
+        // QI additions
+        let QIattBoostAttacker = this.getQIBoostForEntity(entity, this.stats.era, "att_boost_attacker");
+        let QIattDefBoostAttacker = this.getQIBoostForEntity(entity, this.stats.era, "att_def_boost_attacker");
+        let QIdefBoostAttacker = this.getQIBoostForEntity(entity, this.stats.era, "def_boost_attacker");
+        QI_Aoffense = QIattBoostAttacker + QIattDefBoostAttacker;
+        QI_Adefense = QIdefBoostAttacker + QIattDefBoostAttacker;
+
+        let QIattBoostDefender = this.getQIBoostForEntity(entity, this.stats.era, "att_boost_defender");
+        let QIattDefBoostDefender = this.getQIBoostForEntity(entity, this.stats.era, "att_def_boost_defender");
+        let QIdefBoostDefender = this.getQIBoostForEntity(entity, this.stats.era, "def_boost_defender");
+        QI_Doffense = QIattBoostDefender + QIattDefBoostDefender;
+        QI_Ddefense = QIdefBoostDefender + QIattDefBoostDefender;
 
         let FP = this.getBoostForEntity(entity, this.stats.era, "fp");
 
@@ -667,6 +703,12 @@ class BuildingStats {
                         important: (this.buildingDatabase[entity.asset_id]?.important || false),
                         FP: FP,
                         FPefficiency: FP / sizeForEfficiency,
+
+                        // QI additions
+                        QI_Aoffense,
+                        QI_Adefense,
+                        QI_Doffense,
+                        QI_Ddefense,
                        };
     
         return result;
@@ -726,6 +768,38 @@ class BuildingStats {
                 }
             }
 
+        }
+        return total;
+    }
+
+    // NEW QI function for guild_raids
+    getQIBoostForEntity(entity, era, wantedBoost) {
+        if (typeof(entity) == 'string')
+            entity = MainParser.CityEntities[entity];
+
+        if (!entity)
+            throw Error("Unknown entity for QI");
+
+        let total = 0;
+
+        for (const age of ["AllAge", era]) {
+            const boosts = entity?.components?.[age]?.boosts?.boosts || [];
+            for (const boost of boosts) {
+                if (boost.targetedFeature === "guild_raids" && boost.type == wantedBoost)
+                    total += boost.value;
+            }
+            if (entity.abilities) {
+                for (const ability of entity.abilities) {
+                    const hints = ability?.boostHints || [];
+                    for (const hint of hints) {
+                        const hintMap = hint.boostHintEraMap;
+                        if (!hintMap) continue;
+                        if (!hintMap[age]) continue;
+                        if (hintMap[age].targetedFeature === "guild_raids" && hintMap[age].type == wantedBoost)
+                            total += hintMap[age].value;
+                    }
+                }
+            }
         }
         return total;
     }
