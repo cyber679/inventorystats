@@ -714,7 +714,7 @@ class BuildingStats {
         return result;
     };
 
-    getBoostForEntity(entity, era, wantedBoost, targetedFeature="battlegrounds") {
+    getBoostForEntity(entity, era, wantedBoost, targetedFeature="battleground") {
 
 	if (typeof(targetedFeature) == "string")
 	{
