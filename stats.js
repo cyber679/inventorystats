@@ -516,9 +516,9 @@ class BuildingStats {
             totalQI_DDefense += (QI_Ddefense || 0) * quantity;
         });
         this.overlay.find(".totals").html(` Player: <span class='${this.stats.isOther?"player-name other":"player-name own"}'>${this.stats.currentPlayer}</span> | Era: ${this.stats.era}<br/>A. Offense: ${totalAOffense} | A. Defense: ${totalADefense} | D. Offense: ${totalDOffense} | D. Defense: ${totalDDefense}`
-            + (GBs ? "" :  "<Br/><i><small>Not including GBs</small></i>")
             // QI additions
             + `<br/>QI: A. Offense: ${totalQI_AOffense} | A. Defense: ${totalQI_ADefense} | D. Offense: ${totalQI_DOffense} | D. Defense: ${totalQI_DDefense}`
+            + (GBs ? "" :  "<Br/><i><small>Not including GBs</small></i>")
         );
 
         if (typeof window.statTracking != 'undefined')
