@@ -1,6 +1,6 @@
 //Version 0.8
 // - Added Images
-// - Scroll bar hidden
+// - Scroll bar color changed to black and gray.
 // - Added missing QI stats
 // - Added chain buildings
 // - Added comma formatting for display of results.
@@ -20,14 +20,14 @@
 
 const images = (function () {
   const _urls = {
-    attacking_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gbg-6698c3c31.png", // <img src='${images("attacking_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    attacking_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gbg-ddc716eef.png", // <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    attacking_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gr-55242b40c.png", // <img src='${images("attacking_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
-    attacking_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gr-e56d51f6b.png", // <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
-    defending_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gbg-3eacd4cf6.png", // <img src='${images("defending_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    defending_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gbg-2a54e8a2f.png", // <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    defending_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gr-98387c45e.png", // <img src='${images("defending_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
-    defending_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gr-2b802719e.png", // <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+    	attacking_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gbg-6698c3c31.png", // <img src='${images("attacking_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+    	attacking_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gbg-ddc716eef.png", // <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+    	attacking_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gr-55242b40c.png", // <img src='${images("attacking_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+   	attacking_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gr-e56d51f6b.png", // <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+    	defending_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gbg-3eacd4cf6.png", // <img src='${images("defending_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+    	defending_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gbg-2a54e8a2f.png", // <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+    	defending_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gr-98387c45e.png", // <img src='${images("defending_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+	defending_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gr-2b802719e.png", // <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
 	combinedGbGAttacking:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_all_gbg-b4df0c8df.png", // <img src='${images("combinedGbGAttacking")}' style='width:20px;height:20px;vertical-align:middle;'>
 	combinedGbGDefending:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_all_gbg-8c6ef372b.png", // <img src='${images("combinedGbGDefending")}' style='width:20px;height:20px;vertical-align:middle;'>
 	combinedGbGAttackingandDefending: "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defending_all_gbg-1d7abd477.png", // <img src='${images("combinedGbGAttackingandDefending")}' style='width:20px;height:20px;vertical-align:middle;'>
@@ -450,19 +450,33 @@ class BuildingStats {
         }
         `;
 
-		// Hides scroll bars so no bright white bars.
+		// Scroll bar - black and gray.
 		this.css += `
 		#stats-overlay,
 		#stats-overlay * {
-			scrollbar-width:none;
-			-ms-overflow-style:none;
+			scrollbar-width:thin;
+			scrollbar-color:gray black;
 		}
 		#stats-overlay::-webkit-scrollbar,
 		#stats-overlay *::-webkit-scrollbar {
-			display:none;
+			width:8px;
+			height:8px;
+		}
+		#stats-overlay::-webkit-scrollbar-track,
+		#stats-overlay *::-webkit-scrollbar-track {
+			background:black;
+		}
+		#stats-overlay::-webkit-scrollbar-thumb,
+		#stats-overlay *::-webkit-scrollbar-thumb {
+			background:gray;
+			border-radius:4px;
 		}
 		`;
 
+		let updateTableHeaderOffset = function(){
+			overlay.find('#stats-table > thead').css('top','165px');
+		};
+		updateTableHeaderOffset();
 
         // Initialize sorter
         overlay.find("select.sorter")
@@ -831,31 +845,24 @@ class BuildingStats {
             for (const ability of entity.abilities) {
                 if (ability.__class__ === "ChainLinkAbility") {
                     let linkBoost = ability.bonusGiven?.boost?.[this.stats.era] ?? ability.bonusGiven?.boost?.AllAge ?? ability.bonusGiven?.boost;
-                    console.log("ChainLinkAbility for", entity.name, "linkBoost:", linkBoost);
                     if (linkBoost) {
                         if (linkBoost.type === "att_boost_attacker") {
-                            console.log("Adding att_boost_attacker", linkBoost.value, "to Aoffense for", entity.name);
                             Aoffense += linkBoost.value;
                         }
                         if (linkBoost.type === "att_boost_defender") {
-                            console.log("Adding att_boost_defender", linkBoost.value, "to Doffense for", entity.name);
                             Doffense += linkBoost.value;
                         }
                         if (linkBoost.type === "def_boost_attacker") {
-                            console.log("Adding def_boost_attacker", linkBoost.value, "to Adefense for", entity.name);
                             Adefense += linkBoost.value;
                         }
                         if (linkBoost.type === "def_boost_defender") {
-                            console.log("Adding def_boost_defender", linkBoost.value, "to Ddefense for", entity.name);
                             Ddefense += linkBoost.value;
                         }
                         if (linkBoost.type === "att_def_boost_attacker") {
-                            console.log("Adding att_def_boost_attacker", linkBoost.value, "to Aoffense and Adefense for", entity.name);
                             Aoffense += linkBoost.value;
                             Adefense += linkBoost.value;
                         }
                         if (linkBoost.type === "att_def_boost_defender") {
-                            console.log("Adding att_def_boost_defender", linkBoost.value, "to Doffense and Ddefense for", entity.name);
                             Doffense += linkBoost.value;
                             Ddefense += linkBoost.value;
                         }
