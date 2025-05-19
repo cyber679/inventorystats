@@ -282,7 +282,13 @@ class BuildingStats {
             table.stats-data tr > td:not(:first-child) {
                 white-space:nowrap;
             }
-        `;        
+	    #stats-header div.totals img+span {
+		display: inline-block;
+		min-width: 55px;
+		text-align: left;
+		padding: 0 15px 0 5px;
+	    }
+        `;
 
         this.initializeCollapseControl();
         this.initializeOverlay();
@@ -668,15 +674,15 @@ class BuildingStats {
 		  ` Player: <span class='${this.stats.isOther ? "player-name other" : "player-name own"}'>
 		      ${this.stats.currentPlayer}</span> |
 		    Era: ${this.stats.era}<br/>
-		    <img src='${images("attacking_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalAOffense)}&nbsp;|&nbsp;
-		    <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalADefense)}&nbsp;|&nbsp;
-		    <img src='${images("defending_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalDOffense)}&nbsp;|&nbsp;
-		    <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalDDefense)}<br/>
+		    <img src='${images("attacking_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalAOffense)}</span> 
+		    <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalADefense)}</span> 
+		    <img src='${images("defending_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalDOffense)}</span> 
+		    <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalDDefense)}</span><br/>
 
-		    <img src='${images("attacking_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_AOffense)}&nbsp;|&nbsp;
-		    <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_ADefense)}&nbsp;|&nbsp;
-		    <img src='${images("defending_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_DOffense)}&nbsp;|&nbsp;
-		    <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_DDefense)}`
+		    <img src='${images("attacking_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_AOffense)}</span> 
+		    <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_ADefense)}</span> 
+		    <img src='${images("defending_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_DOffense)}</span> 
+		    <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_DDefense)}</span>`
 		  + (GBs ? "" : "<br/><i><small>Not including GBs</small></i>")
 		);
 
