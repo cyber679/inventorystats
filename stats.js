@@ -1,6 +1,8 @@
+//Version 0.9
+// - Added support to show buildings with allies and it's efficiency.
 //Version 0.8
 // - Added Images
-// - Scroll bar color changed to black and gray.
+// - Scroll bar hidden
 // - Added missing QI stats
 // - Added chain buildings
 // - Added comma formatting for display of results.
@@ -20,13 +22,13 @@
 
 const images = (function () {
   const _urls = {
-    	attacking_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gbg-6698c3c31.png", // <img src='${images("attacking_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    	attacking_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gbg-ddc716eef.png", // <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    	attacking_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gr-55242b40c.png", // <img src='${images("attacking_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
-   	attacking_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gr-e56d51f6b.png", // <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
-    	defending_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gbg-3eacd4cf6.png", // <img src='${images("defending_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    	defending_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gbg-2a54e8a2f.png", // <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
-    	defending_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gr-98387c45e.png", // <img src='${images("defending_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+	attacking_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gbg-6698c3c31.png", // <img src='${images("attacking_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+	attacking_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gbg-ddc716eef.png", // <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+	attacking_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_attack_gr-55242b40c.png", // <img src='${images("attacking_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+	attacking_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_defense_gr-e56d51f6b.png", // <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
+	defending_attack_gbg:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gbg-3eacd4cf6.png", // <img src='${images("defending_attack_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+	defending_defense_gbg:            "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gbg-2a54e8a2f.png", // <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'>
+	defending_attack_gr:              "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_attack_gr-98387c45e.png", // <img src='${images("defending_attack_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
 	defending_defense_gr:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_defense_gr-2b802719e.png", // <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'>
 	combinedGbGAttacking:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_attacking_all_gbg-b4df0c8df.png", // <img src='${images("combinedGbGAttacking")}' style='width:20px;height:20px;vertical-align:middle;'>
 	combinedGbGDefending:             "https://foeus.innogamescdn.com/assets/shared/gui/boost/boost_icon_bonus_defending_all_gbg-8c6ef372b.png", // <img src='${images("combinedGbGDefending")}' style='width:20px;height:20px;vertical-align:middle;'>
@@ -170,6 +172,7 @@ class BuildingStats {
     initializeDefaults() {
         this.settings.showInventory ??= true;
         this.settings.downgradeTemporaryItems ??= true;
+		this.settings.splitAllies ??= false;
     }
 
     displaySelf() {
@@ -282,13 +285,7 @@ class BuildingStats {
             table.stats-data tr > td:not(:first-child) {
                 white-space:nowrap;
             }
-	    #stats-header div.totals img+span {
-		display: inline-block;
-		min-width: 55px;
-		text-align: left;
-		padding: 0 15px 0 5px;
-	    }
-        `;
+        `;        
 
         this.initializeCollapseControl();
         this.initializeOverlay();
@@ -330,6 +327,7 @@ class BuildingStats {
                 | 
                 <input type=checkbox id='show-hidden-buildings'> <label style='margin-left:5px;' onclick='$(this).prev().click()' title="Whether or not to show buildings you've marked as hidden (the eyeball on each row)">Show Hidden</label>
                 <input type=checkbox id='show-inventory'> <label style='margin-left:5px;' onclick='$(this).prev().click()'>Show Inventory</label>
+				<input type=checkbox id='split-allies'> <label style='margin-left:5px;' onclick='$(this).prev().click()'>Show Allies</label>
                 | <span title="Whether to display percentages, efficiency/square numbers, or both">Show:</span> <select id='stats-to-show'>
                     <option value='%'>Percentages</option>
                     <option value='#'>Efficiency</option>
@@ -532,7 +530,12 @@ class BuildingStats {
                 self.displayInventory();
                 overlay.toggleClass("inventory", this.shouldInventoryDisplay());
             })
-
+		overlay.find("#split-allies")
+		    .prop("checked", this.settings.splitAllies || false)
+		    .change(function() {
+		        self.settings.splitAllies = $(this).is(":checked");
+		        self.displayBuildings();
+		    });
     }
     
     initializeCollapseControl() {
@@ -658,7 +661,7 @@ class BuildingStats {
         };
 
         // Merge in ally stats
-        addAllyStats(totals);
+        if (!this.settings.splitAllies) addAllyStats(totals);
 
         // Overwrite local totals after merging
         totalAOffense = totals.attackingAttack;
@@ -674,15 +677,15 @@ class BuildingStats {
 		  ` Player: <span class='${this.stats.isOther ? "player-name other" : "player-name own"}'>
 		      ${this.stats.currentPlayer}</span> |
 		    Era: ${this.stats.era}<br/>
-		    <img src='${images("attacking_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalAOffense)}</span> 
-		    <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalADefense)}</span> 
-		    <img src='${images("defending_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalDOffense)}</span> 
-		    <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalDDefense)}</span><br/>
+		    <img src='${images("attacking_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalAOffense)}&nbsp;|&nbsp;
+		    <img src='${images("attacking_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalADefense)}&nbsp;|&nbsp;
+		    <img src='${images("defending_attack_gbg")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalDOffense)}&nbsp;|&nbsp;
+		    <img src='${images("defending_defense_gbg")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalDDefense)}<br/>
 
-		    <img src='${images("attacking_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_AOffense)}</span> 
-		    <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_ADefense)}</span> 
-		    <img src='${images("defending_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_DOffense)}</span> 
-		    <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'><span>${formatCommas(totalQI_DDefense)}</span>`
+		    <img src='${images("attacking_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_AOffense)}&nbsp;|&nbsp;
+		    <img src='${images("attacking_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_ADefense)}&nbsp;|&nbsp;
+		    <img src='${images("defending_attack_gr")}'  style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_DOffense)}&nbsp;|&nbsp;
+		    <img src='${images("defending_defense_gr")}' style='width:20px;height:20px;vertical-align:middle;'> ${formatCommas(totalQI_DDefense)}`
 		  + (GBs ? "" : "<br/><i><small>Not including GBs</small></i>")
 		);
 
@@ -705,11 +708,24 @@ class BuildingStats {
         const buildingCounts = this.groupBuildings();
         const table = this.overlay.find("#stats-table");
         const buildingDatabase = this.buildingDatabase;
-        const buildingEntries = Object.entries(buildingCounts).map(([cityentityId, { quantity }]) => {
-            const res = self.getBuildingInfo(cityentityId);
-            res.quantity = quantity;
-            return res;
-        });
+		const buildingEntries = Object.entries(buildingCounts).map(([key, info]) => {
+			const { quantity, ally, slot } = info;
+			const baseId = key.split("_ally_")[0].split("_slot")[0];
+			const row    = self.getBuildingInfo(baseId);
+			row.quantity = quantity;
+		
+			if (ally) {
+				applyAllyBoosts(row, ally);
+				const aName  = ally.allyId.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+				const rarity = (ally.rarity?.value || ally.rarity || "")
+				               .replace(/\b\w/g,d=>d.toUpperCase());
+				row.name += " (" + aName + (rarity ? " - " + rarity : "") + ")";
+			} else if (slot) {
+				row.name += " (Ally Slot)";
+			}
+		
+			return row;
+		});
         // Sort entries: missing data rows (orange) at the top, then by efficiency descending
         buildingEntries.sort((a, b) => {
             const sort = self.settings.sort || this.#defaultSort;
@@ -733,17 +749,41 @@ class BuildingStats {
     }
     
     // Function to group buildings by their cityentityId and count occurrences
-    groupBuildings() {
-        const buildings = Object.values(stats.buildings); // Assuming buildings data is in MainParser.CityMapData
-        return buildings.reduce((acc, building) => {
-            const cityentityId = building.cityentity_id;
-            if (!acc[cityentityId]) {
-                acc[cityentityId] = { quantity: 0 };
-            }
-            acc[cityentityId].quantity += 1;
-            return acc;
-        }, {});
-    }
+	groupBuildings() {
+		const split   = this.settings.splitAllies;
+		const allies  = MainParser?.Allies?.allyList     || {};
+		const slots   = MainParser?.Allies?.buildingList || {};
+
+		const allyByBuildId = {};
+		for (const a of Object.values(allies))
+			if (a.mapEntityId) allyByBuildId[a.mapEntityId] = a;
+
+		const buildings = Object.entries(stats.buildings);
+
+		return buildings.reduce((acc, [buildId, b]) => {
+			const ally  = allyByBuildId[buildId];
+			const slot  = slots[buildId] ? true : false;
+
+			let key;
+			if (split && ally) {
+				key = b.cityentity_id + "_ally_" + buildId;
+				acc[key] = { quantity: 1, ally };
+				return acc;
+			}
+
+			if (split && slot && !ally) {
+				key = b.cityentity_id + "_slot";
+				acc[key] = acc[key] || { quantity: 0, slot: true };
+				acc[key].quantity += 1;
+				return acc;
+			}
+
+			key = b.cityentity_id;
+			acc[key] = acc[key] || { quantity: 0 };
+			acc[key].quantity += 1;
+			return acc;
+		}, {});
+	}
 
     getBuildingInfo(cityentity_id, isChained = false) {
         const entity = MainParser.CityEntities[cityentity_id];
@@ -1414,6 +1454,57 @@ function getChainedBuildings(cityMapData) {
         }
     }
     return chained;
+}
+
+function applyAllyBoosts(row, ally) {
+	const boosts = ally?.currentLevel?.boosts || [];
+	for (let boost of boosts) {
+		let t = boost.targetedFeature;
+		if (typeof t === "string") {
+			t = [t];
+			if (t[0] !== "guild_raids") t.push("all");
+		}
+		const v      = boost.value || 0;
+		const inCity = t.includes("all");
+		const inQI   = t.includes("guild_raids");
+		switch (boost.type) {
+			case "att_boost_attacker":
+				if (inCity) row.Aoffense += v;
+				if (inQI)   row.QI_Aoffense += v;
+				break;
+			case "def_boost_attacker":
+				if (inCity) row.Adefense += v;
+				if (inQI)   row.QI_Adefense += v;
+				break;
+			case "att_def_boost_attacker":
+				if (inCity) { row.Aoffense += v; row.Adefense += v; }
+				if (inQI)   { row.QI_Aoffense += v; row.QI_Adefense += v; }
+				break;
+			case "att_boost_defender":
+				if (inCity) row.Doffense += v;
+				if (inQI)   row.QI_Doffense += v;
+				break;
+			case "def_boost_defender":
+				if (inCity) row.Ddefense += v;
+				if (inQI)   row.QI_Ddefense += v;
+				break;
+			case "att_def_boost_defender":
+				if (inCity) { row.Doffense += v; row.Ddefense += v; }
+				if (inQI)   { row.QI_Doffense += v; row.QI_Ddefense += v; }
+				break;
+		}
+	}
+	row.Atotal = row.Aoffense + row.Adefense;
+	row.Dtotal = row.Doffense + row.Ddefense;
+	if (row.size) {
+		row.efficiency   = (row.Atotal + row.Dtotal) / row.size;
+		row.Aefficiency  = row.Atotal   / row.size;
+		row.AOefficiency = row.Aoffense / row.size;
+		row.ADefficiency = row.Adefense / row.size;
+		row.Defficiency  = row.Dtotal   / row.size;
+		row.DOefficiency = row.Doffense / row.size;
+		row.DDefficiency = row.Ddefense / row.size;
+	}
 }
 
 function isBuildingChained(building, cityMapData) {
