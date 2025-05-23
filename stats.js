@@ -2,7 +2,7 @@
 // - Added support to show buildings with allies and it's efficiency.
 //Version 0.8
 // - Added Images
-// - Scroll bar hidden
+// - Scroll bar color changed to black and gray.
 // - Added missing QI stats
 // - Added chain buildings
 // - Added comma formatting for display of results.
@@ -222,7 +222,7 @@ class BuildingStats {
             table.stats-data tr > td:not(:first-child) {
                 white-space:nowrap;
             }
-		    #stats-header div.totals img+span {
+			#stats-header div.totals img+span {
 				display: inline-block;
 				min-width: 55px;
 				text-align: left;
@@ -632,7 +632,8 @@ class BuildingStats {
 				               .replace(/\b\w/g,d=>d.toUpperCase());
 				row.name += " (" + aName + (rarity ? " - " + rarity : "") + ")";
 			} else if (slot) {
-				row.name += " (Ally Slot)";
+				const rarity	= MainParser.CityEntities[baseId]?.components?.AllAge?.ally?.rooms?.[0]?.rarity?.value || "";
+				row.name += " (Ally Room" + (rarity ? " - " + rarity.replace(/\b\w/g,c=>c.toUpperCase()) : "") + ")";
 			}
 		
 			return row;
@@ -673,7 +674,8 @@ class BuildingStats {
 
 		return buildings.reduce((acc, [buildId, b]) => {
 			const ally  = allyByBuildId[buildId];
-			const slot  = slots[buildId] ? true : false;
+			const seat	= MainParser.CityEntities[b.cityentity_id]?.components?.AllAge?.ally?.rooms?.[0] || null;
+			const slot	= slots[buildId] || seat;
 
 			let key;
 			if (split && ally) {
@@ -1058,7 +1060,7 @@ class BuildingStats {
         tbody.empty();
         itemList.forEach((item) => {
             if (item.hidden && !this.settings.showHidden) return;
-            if (["hub_main", "main_building", "street", "outpost_ship", "off_grid", "friends_tavern"].includes(item.type))
+            if (["hub_main", "hub_part", "main_building", "street", "outpost_ship", "off_grid", "friends_tavern"].includes(item.type))
                 return;
 
             let rowClasses = [];
@@ -1341,6 +1343,12 @@ class BuildingStats {
                 delete this.inventory[assetId];
                 continue;
             }
+
+			const seatInfo	= MainParser.CityEntities[assetId]?.components?.AllAge?.ally?.rooms?.[0] || null;
+			if (seatInfo && !this.inventory[assetId].name.includes("Ally")) {
+				const rarity	= seatInfo?.rarity?.value || seatInfo?.rarity || "";
+				stats.name += " (Ally" + (rarity ? " - " + rarity.replace(/\b\w/g,c=>c.toUpperCase()) : "") + ")";
+			}
 
             // copy stats to inventory object
             for (let i in stats)
