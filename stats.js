@@ -2,7 +2,7 @@
 // - Added support to show buildings with allies and it's efficiency.
 //Version 0.8
 // - Added Images
-// - Scroll bar hidden
+// - Scroll bar color changed to black and gray.
 // - Added missing QI stats
 // - Added chain buildings
 // - Added comma formatting for display of results.
@@ -222,7 +222,7 @@ class BuildingStats {
             table.stats-data tr > td:not(:first-child) {
                 white-space:nowrap;
             }
-		    #stats-header div.totals img+span {
+			#stats-header div.totals img+span {
 				display: inline-block;
 				min-width: 55px;
 				text-align: left;
@@ -1058,7 +1058,7 @@ class BuildingStats {
         tbody.empty();
         itemList.forEach((item) => {
             if (item.hidden && !this.settings.showHidden) return;
-            if (["hub_main", "main_building", "street", "outpost_ship", "off_grid", "friends_tavern"].includes(item.type))
+            if (["hub_main", "hub_part", "main_building", "street", "outpost_ship", "off_grid", "friends_tavern"].includes(item.type))
                 return;
 
             let rowClasses = [];
