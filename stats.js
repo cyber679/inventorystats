@@ -1179,6 +1179,10 @@ class BuildingStats {
                 if (assetName == "selection_kit_epic_GR24_2" && 
                    !["Neo King - Lv. 1", "Neo King Upgrade Kit"].includes(kitItem.name))
                     continue;
+
+		if (assetName == "selection_kit_epic_GR25_1" &&
+		  !["Neo Checkmate Square - Lv. 1", "Neo Checkmate Square Upgrade Kit"].includes(kitItem.name))
+		    continue;
                 
                 this.addInventoryItem(kitItem.itemAssetName, quantity, kitItem.name); // using parent quantity itentionally here; kitItem.quantity is probably always 1, but if we are adding 8SKs we need to add 8 of each item it could produce
                 // if this is an upgrade kit, check if the original upgrade item is in the same SK
