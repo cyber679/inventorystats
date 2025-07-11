@@ -1165,7 +1165,7 @@ class BuildingStats {
         if (MainParser.SelectionKits[assetName] )//&& !this.settings.dontAssemble )
         {
             let upgradeKits = [];
-            let kitItems = MainParser.SelectionKits[assetName]?.eraOptions?.[stats.era]?.options;
+            let kitItems = MainParser.SelectionKits[assetName]?.options;
             if (!kitItems)
             {
                 console.log("Can't find selection kit items for "+assetName + " era "+stats.era);
