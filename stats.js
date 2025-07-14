@@ -167,10 +167,12 @@ class BuildingStats {
             }
 
             div#stats-overlay [title] { cursor: help; }
-            .efHigh { color: #6bc86b; font-weight: bold; }
-            .efLow { color: #e47373; font-weight:bold; }
-            .efNone { color: gray; }
-            .efMid { color: #9c9cff; }
+            .efGreen { color: #6bc86b; font-weight: bold; }
+            .efBlue { color: #9c9cff; font-weight: bold; }
+            .efYellow { color: #e5c558; font-weight: bold; }
+            .efRed { color: #e47373; font-weight:bold; }
+            .efNone { color: gray; font-weight: bold; }
+            .efZero { color: gray; font-weight: bold; }
             span.player-name.other { color: pink; }
 
             table.stats-data tr.important td {
@@ -604,14 +606,17 @@ class BuildingStats {
             window.statTracking({player: this.stats.currentPlayer, era: this.stats.era, AOffense: this.totalAOffense, ADefense: this.totalDDefense, DOffense: this.totalDOffense, DDefense: this.totalDDefense});
     }
 
-    getClassForEfficiency(efficiency) {
-        if (isNaN(efficiency)) return "efNone";
-        if (efficiency >= 10) return "efHigh";
-        if (efficiency >= 5) return "efMid";
-        if (efficiency >= 2.5) return "efMid";
-        if (efficiency >= 0) return "efLow";
-        return "efNone";
-    }
+	getClassForEfficiency(efficiency, scale = 1) {
+		if (efficiency === undefined || efficiency === null) return "efZero";
+		if (isNaN(efficiency)) return "efZero";
+		if (efficiency >= 8 * scale) return "efGreen";
+		if (efficiency >= 5 * scale) return "efBlue";
+		if (efficiency >= 3 * scale) return "efYellow";
+		if (efficiency >= 1 * scale) return "efRed";
+		if (efficiency > 0) return "efRed";
+		if (efficiency === 0) return "efZero";
+		return "efZero";
+	}
     
     // Display buildings function
     displayBuildings() {
@@ -1100,7 +1105,14 @@ class BuildingStats {
                 </tr>
                 `);
             item.statTotal = item.Aoffense + item.Doffense + item.Adefense + item.Ddefense;
-            for (let stat of [['Aoffense', 'AOefficiency'], ['Adefense', 'ADefficiency'], ['Atotal', 'Aefficiency'], ['Doffense', 'DOefficiency'], ['Ddefense', 'DDefficiency'], ['Dtotal', 'Defficiency'], ['statTotal', 'efficiency']])
+            for (let stat of [
+			  ['Aoffense', 'AOefficiency', 1],
+			  ['Adefense', 'ADefficiency', 1],
+			  ['Atotal',   'Aefficiency',  2],
+			  ['Doffense', 'DOefficiency', 1],
+			  ['Ddefense', 'DDefficiency', 1],
+			  ['Dtotal',   'Defficiency',  2],
+			  ['statTotal','efficiency',   4]])
             {
                 if (typeof item[stat[1]] == 'undefined')
                 {
@@ -1108,14 +1120,15 @@ class BuildingStats {
                     continue;
                 }
 
-                let $td = $(`<td attr='${stat[1]}' class='${this.getClassForEfficiency(item[stat[1]])}'>`);
-                if (show == "both" || stat[0] == "statTotal")
-                    $td.html(`<span class='statPercent'>${item[stat[0]]}%</span> (${item[stat[1]].toFixed(1)})`);
-                else if (show == "%")
-                    $td.text(item[stat[0]] + "%");
-                else if (show == "#")
-                    $td.text(item[stat[1]].toFixed(1));
-                $tr.append($td);
+				let cellClass = (item[stat[1]] === 0) ? "efZero" : this.getClassForEfficiency(item[stat[1]], stat[2]);
+				let $td = $(`<td attr='${stat[1]}' class='${cellClass}'>`);
+				if (show == "both" || stat[0] == "statTotal")
+					$td.html(`<span class='statPercent'>${item[stat[0]]}%</span> (${item[stat[1]].toFixed(1)})`);
+				else if (show == "%")
+					$td.text(item[stat[0]] + "%");
+				else if (show == "#")
+					$td.text(item[stat[1]].toFixed(1));
+				$tr.append($td);
             }
 
             $tr.append(`<td>
