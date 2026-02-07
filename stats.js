@@ -119,7 +119,7 @@ class BuildingStats {
     }
 
     displayOther() {
-        this.setBuildings(MainParser.OtherPlayerCityMapData, this.stats.otherPlayerName, this.stats.otherPlayerEra);
+        this.setBuildings(CityMap.OtherPlayer.mapData, this.stats.otherPlayerName, this.stats.otherPlayerEra);
         this.displayBuildings();
         this.displayInventory();
     }
